@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
 // Import Models
 const User = require("./models/User");
@@ -102,25 +103,20 @@ async function seedTelanganaRooms() {
 
 async function connectDB() {
   try {
-    console.log("[FindMyRoom DB] Attempting to connect to standard MongoDB...");
-    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
-    console.log("[FindMyRoom DB] Standard MongoDB Connected Successfully!");
+    console.log("[FindMyRoom DB] Attempting to connect to MongoDB Atlas...");
+    // Mask password in URI for safe logging
+    const maskedUri = MONGO_URI.replace(/:([^:@]+)@/, ':****@');
+    console.log(`[FindMyRoom DB] Using URI: ${maskedUri}`);
+
+    // Increased timeout to allow Atlas connection which can take longer than 2s
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 30000 });
+    console.log("[FindMyRoom DB] MongoDB Atlas Connected Successfully!");
     await seedTelanganaRooms();
   } catch (err) {
-    console.log("[FindMyRoom DB] Standard MongoDB connection failed. Starting In-Memory MongoDB Server...");
-    try {
-      const { MongoMemoryServer } = require("mongodb-memory-server");
-      const mongoServer = await MongoMemoryServer.create();
-      const memoryUri = mongoServer.getUri();
-      await mongoose.connect(memoryUri, { serverSelectionTimeoutMS: 5000 });
-      console.log(`[FindMyRoom DB] In-Memory MongoDB Connected! (${memoryUri})`);
-      
-      // Since it's an in-memory DB, we MUST seed it every time
-      await seedTelanganaRooms();
-    } catch (memErr) {
-      console.error("[FindMyRoom DB] Failed to start In-Memory MongoDB.", memErr);
-      process.exit(1);
-    }
+    console.error("[FindMyRoom DB] MongoDB Atlas connection failed!");
+    console.error("Detailed Error:", err);
+    // Removed MongoMemoryServer fallback as per requirements to ensure it connects to Atlas.
+    process.exit(1);
   }
 }
 
