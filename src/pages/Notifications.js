@@ -20,7 +20,7 @@ function Notifications() {
     fetchNotifications();
 
     // Setup Socket for Real-time
-    const socket = io("http://localhost:5000");
+    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
     socket.emit("join", user.id || user._id);
     
     socket.on("new_notification", (notif) => {

@@ -5,6 +5,8 @@ import { io } from "socket.io-client";
 import ReportModal from "../components/ReportModal";
 import { useAuth } from "../AuthContext";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function Messages() {
   const { user, token } = useAuth();
   const [conversations, setConversations] = useState([]);
@@ -46,7 +48,7 @@ function Messages() {
   // Socket connection
   useEffect(() => {
     if (!token || !user) return;
-    const newSocket = io("http://localhost:5000");
+    const newSocket = io(API_URL);
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -386,20 +388,20 @@ function Messages() {
     if (msg.messageType === 'image') {
       return (
         <div>
-          <img src={`http://localhost:5000${msg.mediaUrl}`} alt="Attachment" style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '5px' }} />
+          <img src={`${API_URL}${msg.mediaUrl}`} alt="Attachment" style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: '5px' }} />
         </div>
       );
     }
     if (msg.messageType === 'audio') {
       return (
         <audio controls style={{ height: '40px', maxWidth: '200px' }}>
-          <source src={`http://localhost:5000${msg.mediaUrl}`} type="audio/webm" />
+          <source src={`${API_URL}${msg.mediaUrl}`} type="audio/webm" />
         </audio>
       );
     }
     if (msg.messageType === 'document') {
       return (
-        <a href={`http://localhost:5000${msg.mediaUrl}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '8px' }}>
+        <a href={`${API_URL}${msg.mediaUrl}`} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'inherit', textDecoration: 'none', background: 'rgba(0,0,0,0.1)', padding: '10px', borderRadius: '8px' }}>
           <FileText size={24} />
           <span>{msg.mediaName || 'Document'}</span>
         </a>
