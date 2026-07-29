@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import { API_URL } from "../config";
 
 function Notifications() {
   const { user, token } = useAuth();
@@ -20,7 +21,7 @@ function Notifications() {
     fetchNotifications();
 
     // Setup Socket for Real-time
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    const socket = io(API_URL);
     socket.emit("join", user.id || user._id);
     
     socket.on("new_notification", (notif) => {

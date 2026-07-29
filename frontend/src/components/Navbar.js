@@ -5,6 +5,7 @@ import { useTheme } from "../ThemeContext";
 import { Compass, LayoutDashboard, LogOut, LogIn, User, Search, MessageSquare, Sun, Moon, Bell, Menu, X, Users, Home } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { io } from "socket.io-client";
+import { API_URL } from "../config";
 
 function Navbar() {
   const { user, token, logout } = useAuth();
@@ -35,7 +36,7 @@ function Navbar() {
       setUnreadCount(count);
     }).catch(console.error);
 
-    const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000");
+    const socket = io(API_URL);
     socket.emit("join", user.id || user._id);
     
     socket.on("new_notification", (notif) => {
